@@ -1,0 +1,68 @@
+{
+  "name": "job-tracker",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --experimental-next-config-strip-types",
+    "build": "prisma generate && npm run build:extension && next build --webpack --experimental-next-config-strip-types",
+    "build:extension": "node --import tsx scripts/build-extension.mts",
+    "start": "next start --experimental-next-config-strip-types",
+    "lint": "eslint .",
+    "claim:legacy": "node --conditions=react-server --import tsx prisma/claim-legacy.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src extension scripts tests *.ts *.json prisma/*.ts --ignore-path .gitignore",
+    "postinstall": "prisma generate && npm run build:extension",
+    "predev": "npm run build:extension",
+    "pretest:e2e": "npm run build:extension"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/newsreader": "5.3.0",
+    "@google/genai": "^2.27.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "firebase": "12.19.0",
+    "firebase-admin": "14.5.0",
+    "next": "16.3.8",
+    "openai": "6.33.0",
+    "pg": "8.20.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@electric-sql/pglite": "0.5.8",
+    "@electric-sql/pglite-socket": "0.2.11",
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.63.0",
+    "@types/chrome": "0.3.5",
+    "@types/node": "^20",
+    "@types/pg": "8.20.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "dotenv": "^17.3.1",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "jiti": "2.7.0",
+    "postcss": "^8",
+    "prettier": "3.9.9",
+    "prisma": "7.10.0",
+    "tsx": "4.23.15",
+    "typescript": "^5",
+    "typescript-eslint": "8.71.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0",
+    "mysql2": "^3.24.0",
+    "@grpc/grpc-js": "^1.14.5",
+    "uuid": "^11.1.1"
+  }
+}

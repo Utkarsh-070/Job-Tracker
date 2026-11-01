@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Tracker</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="popup-header">
+      <a href="#" id="home-link" class="brand" aria-label="Job Tracker capture"
+        ><svg
+          width="27"
+          height="27"
+          viewBox="0 0 32 32"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M16 3v26M3 16h26M6.8 6.8l18.4 18.4M6.8 25.2 25.2 6.8"
+            stroke="currentColor"
+            stroke-width="3.5"
+          /></svg
+        ><span>job tracker<span class="brand-period">.</span></span></a
+      >
+      <button
+        type="button"
+        id="settings-toggle"
+        class="icon-button"
+        aria-label="Connection settings"
+        aria-expanded="false"
+      >
+        <svg
+          width="19"
+          height="19"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <path d="m9 3-1 3-3 1-2 4 2 3 1 3 4 2 3-1 3-1 2-4-1-3-1-3-4-2Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+    </header>
+    <main>
+      <section
+        id="settings-view"
+        class="view"
+        aria-labelledby="settings-heading"
+      >
+        <h1 id="settings-heading">Make the connection<span>.</span></h1>
+        <p class="view-description">
+          Connect to your tracker with Google. Use the same account as the site;
+          your applications stay in your own workspace.
+        </p>
+        <form id="settings-form">
+          <div class="field">
+            <label for="app-url">Tracker URL</label
+            ><input
+              type="url"
+              id="app-url"
+              required
+              placeholder="https://your-tracker.vercel.app"
+            />
+          </div>
+          <button class="btn btn-google" type="submit" id="save-settings">
+            <img src="google.svg" width="20" height="20" alt="" />
+            <span id="google-button-label">Continue with Google</span>
+          </button>
+          <div
+            id="settings-msg"
+            class="status-msg"
+            role="status"
+            aria-live="polite"
+          ></div>
+        </form>
+        <div id="signed-in-account" class="signed-in-account" hidden>
+          <span>Signed in as</span><strong id="account-name"></strong>
+          <span id="account-email"></span>
+          <button class="text-button" type="button" id="sign-out">
+            Sign out of this extension
+          </button>
+        </div>
+        <p class="privacy-note">
+          Google and Firebase handle sign-in. Your selected tracker receives job
+          text for AI capture. Your login stays on this device until you sign
+          out.
+        </p>
+      </section>
+      <section id="main-view" class="view" aria-label="Capture a job">
+        <ol class="capture-steps" aria-label="Capture process">
+          <li class="current" aria-current="step">1. Read</li>
+          <li>2. Review</li>
+          <li>3. Save</li>
+        </ol>
+        <div class="capture-area">
+          <h1>A possibility,<br />worth keeping<span>.</span></h1>
+          <p class="view-description">
+            Open a job posting. Capture the essentials. Keep your next move in
+            view.
+          </p>
+          <div class="source-page" id="source-page" hidden>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M3 8h18M3 3h18v18H3Z" /></svg
+            ><span id="source-host"></span>
+          </div>
+          <button class="btn btn-primary" type="button" id="capture-btn">
+            Capture this job
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+          <button class="text-button" type="button" id="manual-btn">
+            Or enter the details yourself
+          </button>
+          <div
+            id="capture-msg"
+            class="status-msg"
+            role="status"
+            aria-live="polite"
+          ></div>
+        </div>
+        <form id="form-section" class="form-section">
+          <div class="review-heading">
+            <h2>Give it a once-over.</h2>
+            <p>AI can miss things. Check the details before saving.</p>
+          </div>
+          <div class="field">
+            <label for="company">Company *</label
+            ><input
+              type="text"
+              id="company"
+              required
+              maxlength="200"
+              autocomplete="organization"
+              placeholder="Company name"
+            />
+          </div>
+          <div class="field">
+            <label for="role">Role *</label
+            ><input
+              type="text"
+              id="role"
+              required
+              maxlength="300"
+              placeholder="Job title"
+            />
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="applied-at">Date *</label
+              ><input
+                type="date"
+                id="applied-at"
+                required
+                min="1900-01-01"
+                max="2100-12-31"
+              />
+            </div>
+            <div class="field">
+              <label for="salary">Compensation</label
+              ><input
+                type="text"
+                id="salary"
+                maxlength="200"
+                placeholder="As listed"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label for="url">Job listing URL</label
+            ><input
+              type="url"
+              id="url"
+              maxlength="2048"
+              placeholder="https://"
+            />
+          </div>
+          <div class="field">
+            <label for="notes">Notes</label
+            ><textarea
+              id="notes"
+              maxlength="10000"
+              rows="3"
+              placeholder="Requirements, benefits, things to remember…"
+            ></textarea>
+          </div>
+          <div
+            id="save-msg"
+            class="status-msg"
+            role="status"
+            aria-live="polite"
+          ></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="save-applied-btn">
+              Save as applied</button
+            ><button
+              class="btn btn-secondary"
+              type="button"
+              id="save-later-btn"
+            >
+              Save for later</button
+            ><button class="text-button" type="button" id="reset-btn">
+              Clear this draft
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+    <footer class="popup-footer">
+      <span id="connection-label">Your next move, organized.</span
+      ><button type="button" id="open-tracker" class="text-button" hidden>
+        Open tracker
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <path d="M14 3h7v7m0-7L10 14M10 3H3v18h18v-7" />
+        </svg>
+      </button>
+    </footer>
+    <script type="module" src="dist/popup.js"></script>
+  </body>
+</html>

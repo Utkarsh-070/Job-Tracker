@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Job Tracker",
+  "version": "1.2.0",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyx7J+sFSY9yMCqgKMf6tCFNRKkpXou/bfzUu/LjPBk1MtjpEOIEVzL/m2jVmDxDgOw1oKtuy7xlsNq3IaiXkViEMCBHTcFrc+qNgxmJnE29pdWObAEgUZjBIA+jPF7UoC4B9ILvdLKynWARgNrC0DpRYWKdV7Zzypw1OApYWmcABDX5BtsRM9p9rSMfTRoyyeLy2+dr1Rv7nWUJi5JtZ+KRr8Syhzx6w/jDoDLfcq/VQYxQvbWP7a+xqrD+rscqyisZbC/R06eNt5aPUkt+hy6Wr7rkHUUeOYve7Pefs9AYK5J0FY9YapB1A+dNbyCTlK9OfFft3EtzEA72IvoYPAQIDAQAB",
+  "background": { "service_worker": "dist/background.js", "type": "module" },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https: http://localhost:* http://127.0.0.1:*; connect-src https: http://localhost:* http://127.0.0.1:*"
+  },
+  "description": "Capture a job posting, review the details, and save your next opportunity.",
+  "icons": { "128": "icon.png" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Job Tracker",
+    "default_icon": { "128": "icon.png" }
+  },
+  "permissions": ["activeTab", "storage", "scripting", "offscreen"],
+  "host_permissions": [
+    "https://identitytoolkit.googleapis.com/*",
+    "https://securetoken.googleapis.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ]
+}
