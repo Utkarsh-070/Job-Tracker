@@ -6,7 +6,7 @@ import type { PublicAuthConfig } from "@/lib/firebase/public-config";
 
 export function ExtensionAuthBridge({ config }: { config: PublicAuthConfig }) {
   const [status, setStatus] = useState(
-    "Connecting your Google account to Chrome…",
+    "Connecting your Google account to Browser…",
   );
   useEffect(() => {
     const parentOrigin = window.location.ancestorOrigins?.[0];

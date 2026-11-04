@@ -1,7 +1,7 @@
 import { getPublicAuthConfig } from "@/lib/firebase/public-config";
 import { ExtensionAuthBridge } from "./ExtensionAuthBridge";
 export const metadata = {
-  title: "Connect Chrome",
+  title: "Connect Browser",
   robots: { index: false, follow: false },
 };
 export const dynamic = "force-dynamic";

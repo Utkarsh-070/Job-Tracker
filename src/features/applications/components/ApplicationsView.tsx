@@ -177,7 +177,7 @@ export function ApplicationsView({
             <p>
               {applications.length
                 ? "Try a different company or role, or clear the stage filter."
-                : "Add your first application, or capture a job posting with the Chrome extension."}
+                : "Add your first application, or capture a job posting with the Browser extension."}
             </p>
             {applications.length ? (
               <button

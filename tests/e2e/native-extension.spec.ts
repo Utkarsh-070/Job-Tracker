@@ -4,7 +4,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { login } from "../support/firebase";
 
-test("bundled Chrome extension signs in through Firebase and restores its account", async () => {
+test("bundled Browser extension signs in through Firebase and restores its account", async () => {
   test.setTimeout(150000);
   const root = path.resolve("test-results");
   await fs.mkdir(root, { recursive: true });

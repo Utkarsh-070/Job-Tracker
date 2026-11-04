@@ -95,7 +95,7 @@ export function GoogleSignIn() {
       )}
       <p id="google-login-help" className="login-help">
         Your Google account opens your own private tracker. Use the same account
-        in the Chrome extension.
+        in the Browser extension.
       </p>
       <p className="login-session-note">
         Stay signed in for up to 14 days. Log out on shared devices.

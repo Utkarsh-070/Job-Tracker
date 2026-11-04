@@ -266,7 +266,7 @@ async function activePage(): Promise<
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id || !tab.url || !/^https?:\/\//.test(tab.url))
     throw new Error(
-      "Open a job posting on a website. Chrome’s internal pages can’t be captured.",
+      "Open a job posting on a website. Browser’s internal pages can’t be captured.",
     );
   return { ...tab, id: tab.id, url: tab.url };
 }

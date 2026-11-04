@@ -50,12 +50,12 @@ export async function AppShell({
           <details className="extension-guide">
             <summary>
               <Icon name="browser" />
-              <span>Capture from Chrome</span>
+              <span>Capture from Browser</span>
               <Icon name="plus" />
             </summary>
             <div>
               <p>
-                Open Chrome’s Extensions page, enable Developer mode, and load
+                Open Browser’s Extensions page, enable Developer mode, and load
                 the extension folder.
               </p>
               <p>
