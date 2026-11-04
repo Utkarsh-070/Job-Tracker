@@ -87,8 +87,11 @@ test("create, search, edit, clear optional fields, and delete an application", a
     .getByLabel("Company *", { exact: true })
     .fill("Northstar Browser Test");
   await page.getByLabel("Role *", { exact: true }).fill("Frontend Intern");
+  await page.getByLabel("Job type *", { exact: true }).selectOption("INTERN");
   await page.getByLabel("Salary / compensation").fill("₹25,000 / month");
   await page.getByLabel("Job listing URL").fill("https://example.com/job");
+  await page.getByLabel("Job application source").fill("Campus board");
+  await page.getByLabel("Location").fill("N/A");
   await page
     .getByLabel("Notes", { exact: true })
     .fill("A temporary integration test.");
@@ -103,6 +106,8 @@ test("create, search, edit, clear optional fields, and delete an application", a
     .click();
   await page.getByLabel("Salary / compensation").fill("");
   await page.getByLabel("Job listing URL").fill("");
+  await page.getByLabel("Job application source").fill("");
+  await page.getByLabel("Location").fill("");
   await page.getByLabel("Notes", { exact: true }).fill("");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await expect(page).toHaveURL("http://localhost:3037/");
@@ -111,6 +116,8 @@ test("create, search, edit, clear optional fields, and delete an application", a
     .click();
   await expect(page.getByLabel("Salary / compensation")).toHaveValue("");
   await expect(page.getByLabel("Job listing URL")).toHaveValue("");
+  await expect(page.getByLabel("Job application source")).toHaveValue("");
+  await expect(page.getByLabel("Location")).toHaveValue("");
   await expect(page.getByLabel("Notes", { exact: true })).toHaveValue("");
   await page
     .getByRole("button", { name: "Delete application", exact: true })

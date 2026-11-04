@@ -39,6 +39,9 @@ const sampleApplications: Application[] = examples.map(
     status,
     salary,
     url: null,
+    jobType: /intern/i.test(role) ? "INTERN" : "FULL_TIME",
+    source: null,
+    location: null,
     notes:
       "Synthetic example for the design preview. This is not a real job listing or compensation claim.",
     appliedAt: new Date(date),

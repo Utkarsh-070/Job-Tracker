@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { createApplication, updateApplication } from "../actions";
+import { JOB_TYPES, JOB_TYPE_LABELS } from "../jobTypes";
 import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
@@ -29,9 +30,12 @@ export function ApplicationForm({
   const [fields, setFields] = useState({
     company: application?.company ?? "",
     role: application?.role ?? "",
+    jobType: application?.jobType ?? "",
     status: application?.status ?? "APPLIED",
     salary: application?.salary ?? "",
     url: application?.url ?? "",
+    source: application?.source ?? "",
+    location: application?.location ?? "",
     notes: application?.notes ?? "",
     appliedAt: application
       ? dateInput(application.appliedAt)
@@ -114,6 +118,21 @@ export function ApplicationForm({
             placeholder="Job title"
           />
           <Select
+            id="jobType"
+            label="Job type *"
+            required
+            options={[
+              { value: "", label: "Select job type" },
+              ...JOB_TYPES.map((value) => ({
+                value,
+                label: JOB_TYPE_LABELS[value],
+              })),
+            ]}
+            value={fields.jobType}
+            onChange={(event) => updateField("jobType", event.target.value)}
+            error={errors.jobType}
+          />
+          <Select
             id="status"
             label="Application stage"
             options={APPLICATION_STATUSES.map((value) => ({
@@ -155,6 +174,24 @@ export function ApplicationForm({
             onChange={(event) => updateField("url", event.target.value)}
             error={errors.url}
             placeholder="https://"
+          />
+          <Input
+            id="source"
+            label="Job application source"
+            maxLength={200}
+            value={fields.source}
+            onChange={(event) => updateField("source", event.target.value)}
+            error={errors.source}
+            placeholder="Where you found this job"
+          />
+          <Input
+            id="location"
+            label="Location"
+            maxLength={200}
+            value={fields.location}
+            onChange={(event) => updateField("location", event.target.value)}
+            error={errors.location}
+            placeholder="N/A if remote, otherwise fill in"
           />
         </div>
       </fieldset>

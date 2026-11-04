@@ -14,6 +14,9 @@ const valid = {
   salary: "",
   notes: "",
   url: "",
+  jobType: "INTERN",
+  source: " Referral ",
+  location: "",
 };
 test("valid details are trimmed and blank optional values explicitly clear old data", () => {
   const result = validateApplication(valid);
@@ -23,7 +26,14 @@ test("valid details are trimmed and blank optional values explicitly clear old d
   assert.equal(result.data.salary, null);
   assert.equal(result.data.notes, null);
   assert.equal(result.data.url, null);
+  assert.equal(result.data.jobType, "INTERN");
+  assert.equal(result.data.source, "Referral");
+  assert.equal(result.data.location, null);
   assert.equal(result.data.appliedAt.toISOString(), "2026-10-04T00:00:00.000Z");
+  const withoutJobType = { ...valid, jobType: undefined };
+  const fallback = validateApplication(withoutJobType);
+  assert.ok(fallback.success);
+  if (fallback.success) assert.equal(fallback.data.jobType, "FULL_TIME");
 });
 test("reject invalid shapes, whitespace-only names, wrong types, dates, stages, and links", () => {
   for (const value of [
@@ -36,6 +46,10 @@ test("reject invalid shapes, whitespace-only names, wrong types, dates, stages, 
     { ...valid, appliedAt: "2026-02-30" },
     { ...valid, appliedAt: "2101-01-01" },
     { ...valid, appliedAt: new Date(NaN) },
+    { ...valid, jobType: "" },
+    { ...valid, jobType: "CONTRACT" },
+    { ...valid, source: 12 },
+    { ...valid, location: "a".repeat(201) },
     { ...valid, url: "javascript:alert(1)" },
     { ...valid, url: "https://user:password@example.com" },
     { ...valid, notes: "a".repeat(10001) },
@@ -64,6 +78,9 @@ test("CSV quotes values and neutralizes formula injection", () => {
       status: "APPLIED",
       salary: null,
       url: null,
+      jobType: "FULL_TIME",
+      source: null,
+      location: null,
       notes: "two, columns",
       appliedAt: now,
       createdAt: now,

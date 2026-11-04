@@ -1,11 +1,15 @@
+import { JOB_TYPES, type JobType } from "./jobTypes";
 import { APPLICATION_STATUSES, type ApplicationStatus } from "./statuses";
 
 export type ValidatedApplication = {
   company: string;
   role: string;
+  jobType: JobType;
   status: ApplicationStatus;
   salary: string | null;
   url: string | null;
+  source: string | null;
+  location: string | null;
   notes: string | null;
   appliedAt: Date;
 };
@@ -79,7 +83,18 @@ export function validateApplication(input: unknown): ValidationResult {
   const role = readTextField("role", "Role", 300, true);
   const salary = readTextField("salary", "Salary", 200) || null;
   const url = readTextField("url", "Job URL", 2048) || null;
+  const source =
+    readTextField("source", "Job application source", 200) || null;
+  const location = readTextField("location", "Location", 200) || null;
   const notes = readTextField("notes", "Notes", 10000) || null;
+  const jobTypeValue = inputFields.jobType;
+  const jobType =
+    jobTypeValue == null
+      ? "FULL_TIME"
+      : JOB_TYPES.includes(jobTypeValue as JobType)
+        ? (jobTypeValue as JobType)
+        : "";
+  if (!jobType) fieldErrors.jobType = "Choose a job type.";
   if (url && !safeJobUrl(url))
     fieldErrors.url =
       "Use a full http:// or https:// job link without credentials.";
@@ -112,9 +127,12 @@ export function validateApplication(input: unknown): ValidationResult {
     data: {
       company,
       role,
+      jobType: jobType as JobType,
       status: status as ApplicationStatus,
       salary,
       url: safeJobUrl(url),
+      source,
+      location,
       notes,
       appliedAt,
     },

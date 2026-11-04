@@ -15,6 +15,11 @@ enum ApplicationStatus {
   OFFER
 }
 
+enum JobType {
+  INTERN
+  FULL_TIME
+}
+
 model User {
   id           String        @id @default(uuid())
   key          String?       @unique
@@ -30,9 +35,12 @@ model Application {
   id        String            @id @default(uuid())
   company   String
   role      String
+  jobType   JobType           @default(FULL_TIME)
   status    ApplicationStatus @default(APPLIED)
   salary    String?
   url       String?
+  source    String?
+  location  String?
   notes     String?
   appliedAt DateTime
   createdAt DateTime          @default(now())
