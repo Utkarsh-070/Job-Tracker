@@ -47,6 +47,10 @@ const sampleApplications: Application[] = examples.map(
     appliedAt: new Date(date),
     createdAt: new Date(date),
     updatedAt: new Date(date),
+    interviewDate: null,
+    interviewers: null,
+    meetingUrl: null,
+    contacts: [],
   }),
 );
 export default async function PreviewPage({

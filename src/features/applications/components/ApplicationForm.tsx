@@ -15,7 +15,10 @@ import {
   type ApplicationStatus,
 } from "../statuses";
 import { dateInput, localDateInput, validateApplication } from "../validation";
-import type { Application } from "../types";
+import { InterviewCalendar } from "./InterviewCalendar";
+import { ContactsSection } from "./ContactsSection";
+import type { Application, ContactInput } from "../types";
+
 export function ApplicationForm({
   application,
   preview = false,
@@ -40,14 +43,53 @@ export function ApplicationForm({
     appliedAt: application
       ? dateInput(application.appliedAt)
       : localDateInput(),
+    // Calendar fields
+    interviewDate: application?.interviewDate
+      ? (() => {
+          const d = new Date(application.interviewDate);
+          const pad = (n: number) => String(n).padStart(2, "0");
+          return (
+            d.getFullYear() +
+            "-" +
+            pad(d.getMonth() + 1) +
+            "-" +
+            pad(d.getDate()) +
+            "T" +
+            pad(d.getHours()) +
+            ":" +
+            pad(d.getMinutes())
+          );
+        })()
+      : "",
+    interviewers: application?.interviewers ?? "",
+    meetingUrl: application?.meetingUrl ?? "",
   });
+
+  const [contacts, setContacts] = useState<ContactInput[]>(
+    (application?.contacts ?? []).map((c) => ({
+      id: c.id,
+      name: c.name,
+      role: c.role,
+      email: c.email ?? "",
+      linkedinUrl: c.linkedinUrl ?? "",
+      lastContactedAt: c.lastContactedAt
+        ? dateInput(c.lastContactedAt)
+        : "",
+    })),
+  );
+
   function updateField(key: string, value: string) {
     setFields((previous) => ({ ...previous, [key]: value }));
     setErrors((previous) => ({ ...previous, [key]: "" }));
   }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const validated = validateApplication(fields);
+    const payload = {
+      ...fields,
+      contacts,
+    };
+    const validated = validateApplication(payload);
     if (!validated.success) {
       setErrors(validated.fields);
       requestAnimationFrame(() =>
@@ -65,9 +107,14 @@ export function ApplicationForm({
     }
     startTransition(async () => {
       try {
+        const { interviewDate: _d, contacts: _c, ...rest } = validated.data;
         const input = {
-          ...validated.data,
+          ...rest,
           status: fields.status as ApplicationStatus,
+          interviewDate: fields.interviewDate || null,
+          interviewers: fields.interviewers || null,
+          meetingUrl: fields.meetingUrl || null,
+          contacts,
         };
         const result = application
           ? await updateApplication({ id: application.id, ...input })
@@ -195,6 +242,37 @@ export function ApplicationForm({
           />
         </div>
       </fieldset>
+
+      <fieldset disabled={isPending}>
+        <legend>Interview &amp; calendar</legend>
+        <p className="section-description">
+          Schedule an interview date and generate an .ics file or direct Add to Google Calendar link with pre-populated details.
+        </p>
+        <InterviewCalendar
+          company={fields.company}
+          role={fields.role}
+          interviewDate={fields.interviewDate}
+          interviewers={fields.interviewers}
+          meetingUrl={fields.meetingUrl}
+          onChangeDate={(v) => updateField("interviewDate", v)}
+          onChangeInterviewers={(v) => updateField("interviewers", v)}
+          onChangeMeetingUrl={(v) => updateField("meetingUrl", v)}
+          errors={errors}
+        />
+      </fieldset>
+
+      <fieldset disabled={isPending}>
+        <legend>Recruiter &amp; referral contacts</legend>
+        <p className="section-description">
+          Keep track of recruiters, hiring managers, and referrers managing your candidacy or referral.
+        </p>
+        <ContactsSection
+          contacts={contacts}
+          onChange={setContacts}
+          errors={errors}
+        />
+      </fieldset>
+
       <fieldset disabled={isPending}>
         <legend>A place for the details</legend>
         <p className="section-description">
@@ -211,6 +289,7 @@ export function ApplicationForm({
           error={errors.notes}
         />
       </fieldset>
+
       {serverError && (
         <p className="inline-error" role="alert">
           {serverError}

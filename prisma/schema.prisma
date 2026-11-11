@@ -20,6 +20,13 @@ enum JobType {
   FULL_TIME
 }
 
+enum ContactRole {
+  RECRUITER
+  HIRING_MANAGER
+  REFERRER
+  OTHER
+}
+
 model User {
   id           String        @id @default(uuid())
   key          String?       @unique
@@ -32,19 +39,36 @@ model User {
 
 model Application {
   @@index([userId, appliedAt])
-  id        String            @id @default(uuid())
-  company   String
-  role      String
-  jobType   JobType           @default(FULL_TIME)
-  status    ApplicationStatus @default(APPLIED)
-  salary    String?
-  url       String?
-  source    String?
-  location  String?
-  notes     String?
-  appliedAt DateTime
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  userId    String?
-  user      User?             @relation(fields: [userId], references: [id])
+  id              String            @id @default(uuid())
+  company         String
+  role            String
+  jobType         JobType           @default(FULL_TIME)
+  status          ApplicationStatus @default(APPLIED)
+  salary          String?
+  url             String?
+  source          String?
+  location        String?
+  notes           String?
+  appliedAt       DateTime
+  interviewDate   DateTime?
+  interviewers    String?
+  meetingUrl      String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userId          String?
+  user            User?             @relation(fields: [userId], references: [id])
+  contacts        Contact[]
+}
+
+model Contact {
+  id              String      @id @default(uuid())
+  name            String
+  role            ContactRole @default(OTHER)
+  email           String?
+  linkedinUrl     String?
+  lastContactedAt DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  applicationId   String
+  application     Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }

@@ -85,9 +85,107 @@ test("CSV quotes values and neutralizes formula injection", () => {
       appliedAt: now,
       createdAt: now,
       updatedAt: now,
+      interviewDate: null,
+      interviewers: null,
+      meetingUrl: null,
+      contacts: [],
     },
   ]);
   assert.ok(output.includes('"\'=HYPERLINK(1)"'));
   assert.ok(output.includes('"An ""engineer"""'));
   assert.ok(output.includes('"two, columns"'));
+});
+
+test("interview scheduling details are validated and trimmed", () => {
+  const withInterview = {
+    ...valid,
+    interviewDate: "2026-11-20T14:30",
+    interviewers: " Sarah Connor, John Smith ",
+    meetingUrl: "https://meet.google.com/abc-defg-hij",
+  };
+  const result = validateApplication(withInterview);
+  assert.ok(result.success);
+  if (result.success) {
+    assert.ok(result.data.interviewDate instanceof Date);
+    assert.equal(result.data.interviewers, "Sarah Connor, John Smith");
+    assert.equal(
+      result.data.meetingUrl,
+      "https://meet.google.com/abc-defg-hij",
+    );
+  }
+
+  // Reject unsafe meeting URLs
+  const unsafeMeeting = {
+    ...valid,
+    meetingUrl: "javascript:alert('pwned')",
+  };
+  assert.equal(validateApplication(unsafeMeeting).success, false);
+});
+
+test("contacts section validates recruiter, hiring manager, and referrer contacts", () => {
+  const withContacts = {
+    ...valid,
+    contacts: [
+      {
+        name: " Jane Recruiter ",
+        role: "RECRUITER",
+        email: " jane@acme.corp ",
+        linkedinUrl: "https://linkedin.com/in/janerecruiter",
+        lastContactedAt: "2026-11-10",
+      },
+      {
+        name: "Alex Referrer",
+        role: "REFERRER",
+        email: "alex@referral.com",
+        linkedinUrl: "",
+        lastContactedAt: "",
+      },
+      {
+        name: "Bob Manager",
+        role: "HIRING_MANAGER",
+        email: "",
+        linkedinUrl: "https://linkedin.com/in/bobmanager",
+        lastContactedAt: "2026-11-08",
+      },
+    ],
+  };
+
+  const result = validateApplication(withContacts);
+  assert.ok(result.success);
+  if (result.success) {
+    assert.equal(result.data.contacts.length, 3);
+    assert.equal(result.data.contacts[0].name, "Jane Recruiter");
+    assert.equal(result.data.contacts[0].role, "RECRUITER");
+    assert.equal(result.data.contacts[0].email, "jane@acme.corp");
+    assert.equal(
+      result.data.contacts[0].linkedinUrl,
+      "https://linkedin.com/in/janerecruiter",
+    );
+    assert.equal(result.data.contacts[0].lastContactedAt, "2026-11-10");
+
+    assert.equal(result.data.contacts[1].role, "REFERRER");
+    assert.equal(result.data.contacts[1].linkedinUrl, null);
+
+    assert.equal(result.data.contacts[2].role, "HIRING_MANAGER");
+  }
+
+  // Missing contact name is rejected
+  const missingName = {
+    ...valid,
+    contacts: [{ name: "   ", role: "RECRUITER" }],
+  };
+  assert.equal(validateApplication(missingName).success, false);
+
+  // Unsafe linkedin URL is rejected
+  const unsafeLinkedin = {
+    ...valid,
+    contacts: [
+      {
+        name: "Bob",
+        role: "RECRUITER",
+        linkedinUrl: "javascript:void(0)",
+      },
+    ],
+  };
+  assert.equal(validateApplication(unsafeLinkedin).success, false);
 });

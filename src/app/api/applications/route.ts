@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     const application = await prisma.application.create({
-      data: { ...validated.data, userId },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      data: (({ contacts: _contacts, ...rest }) => ({ ...rest, userId }))(validated.data),
     });
     revalidatePath("/");
     return NextResponse.json(application, { status: 201 });

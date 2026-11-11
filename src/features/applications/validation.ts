@@ -1,5 +1,13 @@
 import { JOB_TYPES, type JobType } from "./jobTypes";
 import { APPLICATION_STATUSES, type ApplicationStatus } from "./statuses";
+import type { ContactInput } from "./types";
+
+export const CONTACT_ROLES = [
+  "RECRUITER",
+  "HIRING_MANAGER",
+  "REFERRER",
+  "OTHER",
+] as const;
 
 export type ValidatedApplication = {
   company: string;
@@ -12,6 +20,10 @@ export type ValidatedApplication = {
   location: string | null;
   notes: string | null;
   appliedAt: Date;
+  interviewDate: Date | null;
+  interviewers: string | null;
+  meetingUrl: string | null;
+  contacts: ContactInput[];
 };
 type ValidationResult =
   | { success: true; data: ValidatedApplication }
@@ -116,6 +128,87 @@ export function validateApplication(input: unknown): ValidationResult {
     appliedAt.getUTCFullYear() > 2100
   )
     fieldErrors.appliedAt = "Choose a valid date between 1900 and 2100.";
+  // Interview date (optional)
+  const interviewDateRaw = inputFields.interviewDate;
+  let interviewDate: Date | null = null;
+  if (interviewDateRaw && typeof interviewDateRaw === "string" && interviewDateRaw.trim()) {
+    // Accept both date-only ("YYYY-MM-DD") and datetime-local ("YYYY-MM-DDTHH:mm") formats
+    const raw = interviewDateRaw.trim();
+    const parsed = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+      ? new Date(raw + "T00:00:00.000Z")
+      : new Date(raw);
+    if (Number.isNaN(parsed.getTime())) {
+      fieldErrors.interviewDate = "Choose a valid interview date.";
+    } else {
+      interviewDate = parsed;
+    }
+  } else if (interviewDateRaw instanceof Date) {
+    interviewDate = interviewDateRaw;
+  }
+
+  const interviewers = readTextField("interviewers", "Interviewers", 500) || null;
+  const meetingUrl = readTextField("meetingUrl", "Meeting URL", 2048) || null;
+  if (meetingUrl && !safeJobUrl(meetingUrl))
+    fieldErrors.meetingUrl =
+      "Use a full http:// or https:// meeting link without credentials.";
+
+  // Contacts (optional array)
+  const rawContacts = inputFields.contacts;
+  const contacts: ContactInput[] = [];
+  if (Array.isArray(rawContacts)) {
+    rawContacts.forEach((c: unknown, i: number) => {
+      if (!c || typeof c !== "object") return;
+      const contact = c as Record<string, unknown>;
+      const name = typeof contact.name === "string" ? contact.name.trim() : "";
+      if (!name) {
+        fieldErrors[`contacts[${i}].name`] = "Contact name is required.";
+        return;
+      }
+      const role = CONTACT_ROLES.includes(contact.role as typeof CONTACT_ROLES[number])
+        ? (contact.role as ContactInput["role"])
+        : "OTHER";
+      const email =
+        typeof contact.email === "string" && contact.email.trim()
+          ? contact.email.trim()
+          : null;
+      const rawLinkedin =
+        typeof contact.linkedinUrl === "string" ? contact.linkedinUrl.trim() : "";
+      if (rawLinkedin && !safeJobUrl(rawLinkedin)) {
+        fieldErrors[`contacts[${i}].linkedinUrl`] =
+          "Use a full http:// or https:// LinkedIn URL.";
+      }
+      const linkedinUrl = rawLinkedin ? safeJobUrl(rawLinkedin) : null;
+
+      let lastContactedAt: string | null = null;
+      if (
+        typeof contact.lastContactedAt === "string" &&
+        contact.lastContactedAt.trim()
+      ) {
+        const dateStr = contact.lastContactedAt.trim().slice(0, 10);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          lastContactedAt = dateStr;
+        } else {
+          fieldErrors[`contacts[${i}].lastContactedAt`] =
+            "Choose a valid date.";
+        }
+      } else if (
+        contact.lastContactedAt instanceof Date &&
+        !isNaN(contact.lastContactedAt.getTime())
+      ) {
+        lastContactedAt = dateInput(contact.lastContactedAt);
+      }
+
+      contacts.push({
+        id: typeof contact.id === "string" ? contact.id : undefined,
+        name,
+        role,
+        email,
+        linkedinUrl,
+        lastContactedAt,
+      });
+    });
+  }
+
   if (Object.keys(fieldErrors).length)
     return {
       success: false,
@@ -135,6 +228,10 @@ export function validateApplication(input: unknown): ValidationResult {
       location,
       notes,
       appliedAt,
+      interviewDate,
+      interviewers,
+      meetingUrl,
+      contacts,
     },
   };
 }

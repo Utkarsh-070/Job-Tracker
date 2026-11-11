@@ -13,6 +13,11 @@ const paths = {
   browser: "M3 8h18M6 5h.01M9 5h.01M3 3h18v18H3Z",
   logout: "M9 5H4v14h5m7-14 5 7-5 7M9 12h12",
   file: "M14 2H4v20h16V8Zm0 0v6h6M8 12h8M8 16h5",
+  calendar: "M8 2v4M16 2v4M3 10h18M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z",
+  "chevron-up": "m18 15-6-6-6 6",
+  "chevron-down": "m6 9 6 6 6-6",
+  user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z",
+  trash: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
 };
 export function Icon({
   name,
