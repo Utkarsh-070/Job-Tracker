@@ -1456,3 +1456,112 @@ textarea.form-control {
     display: none;
   }
 }
+
+
+/* ── Stale alert badge ─────────────────────────────────── */
+.stale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: #fff4e0;
+  color: #9a5c00;
+  border: 1px solid #f5c869;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background 0.15s;
+}
+.stale-badge:hover {
+  background: #ffe9b0;
+}
+.date-cell {
+  white-space: nowrap;
+}
+
+/* "Needs attention" filter tab accent */
+.stage-tab.stale-tab strong {
+  background: #fff4e0;
+  color: #9a5c00;
+}
+.stage-tab.stale-tab.is-active {
+  color: #9a5c00;
+}
+
+/* ── Follow-up email modal ─────────────────────────────── */
+.followup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(34, 48, 43, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.followup-modal {
+  background: var(--paper);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 540px;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+.followup-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.followup-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.followup-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 2px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.followup-close:hover {
+  color: var(--ink);
+}
+.followup-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+.followup-textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  resize: vertical;
+}
+.followup-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.followup-actions .button.copied {
+  background: #2b6b4a;
+}

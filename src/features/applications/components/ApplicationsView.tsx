@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ApplicationList } from "./ApplicationList";
+import { isStale } from "./StaleAlert";
 import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
@@ -10,6 +11,7 @@ import {
 } from "../statuses";
 import { applicationsCsv } from "../export";
 import type { Application } from "../types";
+type FilterValue = ApplicationStatus | "STALE" | undefined;
 type Props = {
   applications: Application[];
   initialStatus?: ApplicationStatus;
@@ -24,8 +26,12 @@ export function ApplicationsView({
 }: Props) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("recent");
-  const [status, setStatus] = useState<ApplicationStatus | undefined>(
+  const [status, setStatus] = useState<FilterValue>(
     initialStatus,
+  );
+  const staleCount = useMemo(
+    () => applications.filter(isStale).length,
+    [applications],
   );
   const counts = useMemo(
     () =>
@@ -41,7 +47,7 @@ export function ApplicationsView({
     const searchTerm = query.trim().toLocaleLowerCase();
     const matchingApplications = applications.filter(
       (app) =>
-        (!status || app.status === status) &&
+        (status === undefined || (status === "STALE" ? isStale(app) : app.status === status)) &&
         (!searchTerm ||
           app.company.toLocaleLowerCase().includes(searchTerm) ||
           app.role.toLocaleLowerCase().includes(searchTerm)),
@@ -66,13 +72,14 @@ export function ApplicationsView({
     link.click();
     URL.revokeObjectURL(url);
   }
-  const stages = [
+  const stages: { label: string; value: FilterValue; count: number }[] = [
     { label: "All applications", value: undefined, count: applications.length },
     ...APPLICATION_STATUSES.map((stage) => ({
       label: STATUS_LABELS[stage],
-      value: stage,
+      value: stage as FilterValue,
       count: counts[stage],
     })),
+    { label: "Needs attention", value: "STALE" as FilterValue, count: staleCount },
   ];
   const add = preview ? "/preview?view=new" : "/applications/new";
   const filtersActive = Boolean(status || query.trim());
@@ -104,7 +111,13 @@ export function ApplicationsView({
             key={stage.label}
             type="button"
             className={
-              status === stage.value ? "stage-tab is-active" : "stage-tab"
+              status === stage.value
+                ? stage.value === "STALE"
+                  ? "stage-tab is-active stale-tab"
+                  : "stage-tab is-active"
+                : stage.value === "STALE" && staleCount > 0
+                  ? "stage-tab stale-tab"
+                  : "stage-tab"
             }
             aria-pressed={status === stage.value}
             onClick={() => setStatus(stage.value)}

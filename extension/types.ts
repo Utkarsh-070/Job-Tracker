@@ -15,17 +15,26 @@ export type JobDraft = {
   url: string;
   notes: string;
   appliedAt: string;
+  location: string;
+  jobType: string;
+  source: string;
 };
 
 export type ExtractedJob = Pick<
   JobDraft,
   "company" | "role" | "salary" | "notes"
->;
+> & {
+  location?: string;
+  jobType?: string;
+  source?: string;
+};
 
-export type ValidatedDraft = Omit<JobDraft, "salary" | "notes" | "url"> & {
+export type ValidatedDraft = Omit<JobDraft, "salary" | "notes" | "url" | "location" | "source"> & {
   salary: string | null;
   notes: string | null;
   url: string | null;
+  location: string | null;
+  source: string | null;
 };
 
 export type ExtensionStorage = {
@@ -74,6 +83,9 @@ export type PopupElements = {
   url: HTMLInputElement;
   notes: HTMLTextAreaElement;
   "applied-at": HTMLInputElement;
+  location: HTMLInputElement;
+  "job-type": HTMLSelectElement;
+  source: HTMLInputElement;
   "app-url": HTMLInputElement;
   "main-view": HTMLElement;
   "settings-view": HTMLElement;
