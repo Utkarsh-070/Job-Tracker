@@ -91,6 +91,7 @@ export function isExtractedJob(value: unknown): value is ExtractedJob {
       (key) => typeof value[key] === "string",
     )
   );
+  // location, jobType, source are optional extras — no strict check needed
 }
 
 export function readAuthConfig(value: unknown): PublicAuthConfig {

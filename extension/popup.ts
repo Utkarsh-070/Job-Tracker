@@ -31,6 +31,9 @@ const fieldIds = [
   "url",
   "notes",
   "applied-at",
+  "location",
+  "job-type",
+  "source",
 ] as const;
 let settings: ExtensionStorage = {};
 let user: ExtensionUser | null = null;
@@ -96,13 +99,18 @@ function readDraft(): JobDraft {
     url: byId("url").value,
     notes: byId("notes").value,
     appliedAt: byId("applied-at").value,
+    location: byId("location").value,
+    jobType: byId("job-type").value,
+    source: byId("source").value,
   };
 }
 function fillDraft(draft: Partial<JobDraft> = {}) {
-  for (const id of fieldIds)
-    byId(id).value =
-      draft[id === "applied-at" ? "appliedAt" : id] ??
-      (id === "applied-at" ? today() : "");
+  for (const id of fieldIds) {
+    const key = id === "applied-at" ? "appliedAt" : id === "job-type" ? "jobType" : id;
+    const element = byId(id);
+    const value = draft[key as keyof JobDraft] ?? (id === "applied-at" ? today() : "");
+    element.value = value;
+  }
 }
 async function persistDraft() {
   clearTimeout(draftTimer);
@@ -381,12 +389,19 @@ async function captureJob() {
         "This page has no readable job text. Try a different posting or enter the details yourself.",
       );
     showMessage("capture-msg", "Finding the essentials with AI…", "loading");
-    const extracted = await trackerRequest("/api/extract", { pageText });
+    const extracted = await trackerRequest("/api/extract", { pageText, tabUrl: tab.url });
     if (!isExtractedJob(extracted))
       throw new Error(
         "Capture returned incomplete details. Enter them manually or try again.",
       );
-    fillDraft({ ...extracted, url: tab.url, appliedAt: today() });
+    fillDraft({
+      ...extracted,
+      location: typeof extracted["location"] === "string" ? extracted["location"] : "",
+      jobType: typeof extracted["jobType"] === "string" ? extracted["jobType"] : "FULL_TIME",
+      source: typeof extracted["source"] === "string" ? extracted["source"] : "",
+      url: tab.url,
+      appliedAt: today(),
+    });
     byId("form-section").classList.add("active");
     setStep(1);
     await persistDraft();

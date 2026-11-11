@@ -44,6 +44,12 @@ export function validateDraft(draft: JobDraft): ValidatedDraft {
     throw new Error("Enter a role of 300 characters or fewer.");
   if (draft.salary.length > 200 || draft.notes.length > 10000)
     throw new Error("Shorten the salary or notes before saving.");
+  if (draft.location && draft.location.length > 200)
+    throw new Error("Shorten the location to 200 characters or fewer.");
+  if (draft.source && draft.source.length > 200)
+    throw new Error("Shorten the source to 200 characters or fewer.");
+  if (draft.jobType && !["INTERN", "FULL_TIME"].includes(draft.jobType))
+    throw new Error("Job type must be Intern or Full-Time.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.appliedAt))
     throw new Error("Choose a valid date.");
   const date = new Date(draft.appliedAt + "T00:00:00Z");
@@ -78,5 +84,8 @@ export function validateDraft(draft: JobDraft): ValidatedDraft {
     salary: draft.salary.trim() || null,
     notes: draft.notes.trim() || null,
     url: draft.url.trim() || null,
+    location: draft.location.trim() || null,
+    jobType: draft.jobType || "FULL_TIME",
+    source: draft.source.trim() || null,
   };
 }

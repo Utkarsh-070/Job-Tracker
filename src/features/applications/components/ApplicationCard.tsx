@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { ApplicationStatusBadge } from "./ApplicationStatusBadge";
+import { StaleAlert } from "./StaleAlert";
 import { formatApplicationDate, safeJobUrl } from "../validation";
 import type { Application } from "../types";
 export function CompanyInitial({ company }: { company: string }) {
@@ -45,6 +46,7 @@ export function ApplicationCard({
         <time dateTime={new Date(app.appliedAt).toISOString()}>
           {formatApplicationDate(app.appliedAt)}
         </time>
+        <StaleAlert application={app} />
       </td>
       <td className="salary-cell">{app.salary || "Not listed"}</td>
       <td>
