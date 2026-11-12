@@ -22,10 +22,15 @@ test("the Google sign-in button completes the site popup flow", async ({
     .click();
   const google = await provider;
   await google.waitForLoadState();
+  await page
+    .frameLocator('iframe[src*="/emulator/auth/iframe"]')
+    .locator("body")
+    .waitFor({ state: "attached" });
   await google.getByText(fixtureAccounts.first.email, { exact: false }).click();
   await expect(page).toHaveURL("http://localhost:3037/", { timeout: 30000 });
-  await expect(page.locator(".workspace-account")).toContainText(
-    fixtureAccounts.first.email,
+  await expect(page.locator(".account-avatar")).toHaveAttribute(
+    "aria-label",
+    fixtureAccounts.first.name,
   );
 });
 
@@ -52,8 +57,9 @@ test("Google sessions persist, reject login CSRF, and clear on logout", async ({
     ).status(),
   ).toBe(403);
   await login(page);
-  await expect(page.locator(".workspace-account")).toContainText(
-    fixtureAccounts.first.email,
+  await expect(page.locator(".account-avatar")).toHaveAttribute(
+    "aria-label",
+    fixtureAccounts.first.name,
   );
   const session = (await context.cookies()).find(
     (cookie) => cookie.name === "jt_session",

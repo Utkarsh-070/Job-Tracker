@@ -68,7 +68,7 @@ test("bundled Browser extension signs in through Firebase and restores its accou
     await expect(popup.locator("#main-view")).toBeVisible();
     await popup
       .getByRole("button", {
-        name: "Or enter the details yourself",
+        name: "Enter details manually",
         exact: true,
       })
       .click();
@@ -96,7 +96,7 @@ test("bundled Browser extension signs in through Firebase and restores its accou
     await expect(popup.locator("#form-section")).toBeHidden();
     await popup
       .getByRole("button", {
-        name: "Or enter the details yourself",
+        name: "Enter details manually",
         exact: true,
       })
       .click();
@@ -105,7 +105,7 @@ test("bundled Browser extension signs in through Firebase and restores its accou
     );
     await popup
       .getByLabel("Company *", { exact: true })
-      .fill("Native Chrome Google Save");
+      .fill("Native Browser Google Save");
     await popup.getByLabel("Role *", { exact: true }).fill("Engineer");
     await popup
       .getByRole("button", { name: "Save for later", exact: true })
@@ -114,15 +114,15 @@ test("bundled Browser extension signs in through Firebase and restores its accou
     const site = await context.newPage();
     await login(site, "second");
     await expect(
-      site.getByRole("link", {
-        name: "Native Chrome Google Save",
+      site.getByRole("button", {
+        name: "View Engineer at Native Browser Google Save",
         exact: true,
       }),
     ).toBeVisible();
     await login(site, "first");
     await expect(
-      site.getByRole("link", {
-        name: "Native Chrome Google Save",
+      site.getByRole("button", {
+        name: "View Engineer at Native Browser Google Save",
         exact: true,
       }),
     ).toHaveCount(0);

@@ -100,9 +100,15 @@ test("create, search, edit, clear optional fields, and delete an application", a
     .click();
   await expect(page).toHaveURL("http://localhost:3037/");
   await page.getByRole("searchbox").fill("northstar");
-  await expect(page.locator(".applications-table tbody tr")).toHaveCount(1);
+  await expect(page.locator(".opportunity-list > li")).toHaveCount(1);
   await page
-    .getByRole("link", { name: "Northstar Browser Test", exact: true })
+    .getByRole("button", {
+      name: "View Frontend Intern at Northstar Browser Test",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("link", { name: "Edit application", exact: true })
     .click();
   await page.getByLabel("Salary / compensation").fill("");
   await page.getByLabel("Job listing URL").fill("");
@@ -112,7 +118,13 @@ test("create, search, edit, clear optional fields, and delete an application", a
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await expect(page).toHaveURL("http://localhost:3037/");
   await page
-    .getByRole("link", { name: "Northstar Browser Test", exact: true })
+    .getByRole("button", {
+      name: "View Frontend Intern at Northstar Browser Test",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("link", { name: "Edit application", exact: true })
     .click();
   await expect(page.getByLabel("Salary / compensation")).toHaveValue("");
   await expect(page.getByLabel("Job listing URL")).toHaveValue("");
@@ -172,7 +184,7 @@ test("preview filters, sorting, export, mobile layout, and accessibility", async
   await fs.mkdir(review, { recursive: true });
   await page.goto("/preview");
   await page.getByRole("button", { name: "Saved 2", exact: true }).click();
-  await expect(page.locator(".applications-table tbody tr")).toHaveCount(2);
+  await expect(page.locator(".opportunity-list > li")).toHaveCount(2);
   await expect(
     page.getByRole("button", { name: "Clear filters", exact: true }),
   ).toBeVisible();
@@ -195,15 +207,15 @@ test("preview filters, sorting, export, mobile layout, and accessibility", async
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole("searchbox").fill("razorpay");
-  await expect(page.locator(".applications-table tbody tr")).toHaveCount(1);
+  await expect(page.locator(".opportunity-list > li")).toHaveCount(1);
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
   await expect(page.getByRole("searchbox")).toHaveValue("");
   await expect(
-    page.getByRole("button", { name: "All applications 8", exact: true }),
+    page.getByRole("button", { name: "All 8", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(".applications-table tbody tr")).toHaveCount(8);
+  await expect(page.locator(".opportunity-list > li")).toHaveCount(8);
   await page.getByRole("button", { name: "Saved 2", exact: true }).click();
   await page.getByRole("searchbox").fill("no-such-role");
   await expect(
@@ -213,9 +225,9 @@ test("preview filters, sorting, export, mobile layout, and accessibility", async
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
   await page.getByLabel("Sort applications").selectOption("company");
-  await expect(
-    page.locator(".applications-table tbody tr").first(),
-  ).toContainText("Atlassian");
+  await expect(page.locator(".opportunity-list > li").first()).toContainText(
+    "Atlassian",
+  );
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export", exact: true }).click();
   expect((await download).suggestedFilename()).toBe(

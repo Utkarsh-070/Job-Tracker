@@ -7,24 +7,29 @@ test("popup connects, recovers from AI failures, preserves a draft, and prevents
   page,
 }) => {
   await page.setViewportSize({ width: 376, height: 850 });
+  const review = path.resolve(".impeccable/review");
+  await fs.mkdir(review, { recursive: true });
   const idToken = await googleToken(page.request);
   await page.addInitScript(
     ({ idToken, account }) => {
       const stored = () =>
-        JSON.parse(localStorage.getItem("test-chrome-storage") || "{}");
+        JSON.parse(localStorage.getItem("test-extension-storage") || "{}");
       const area = {
         get: async (keys: string[]) =>
           Object.fromEntries(keys.map((key) => [key, stored()[key]])),
         set: async (value: object) =>
           localStorage.setItem(
-            "test-chrome-storage",
+            "test-extension-storage",
             JSON.stringify({ ...stored(), ...value }),
           ),
         remove: async (keys: string | string[]) => {
           const current = stored();
           for (const key of typeof keys === "string" ? [keys] : keys)
             delete current[key];
-          localStorage.setItem("test-chrome-storage", JSON.stringify(current));
+          localStorage.setItem(
+            "test-extension-storage",
+            JSON.stringify(current),
+          );
         },
         setAccessLevel: async () => {},
       };
@@ -128,6 +133,9 @@ test("popup connects, recovers from AI failures, preserves a draft, and prevents
   await expect(page.locator("#settings-view")).toBeVisible();
   await page.getByLabel("Tracker URL").fill("http://localhost:3037");
   await page
+    .locator("body")
+    .screenshot({ path: path.join(review, "popup-connection.png") });
+  await page
     .getByRole("button", { name: "Continue with Google", exact: true })
     .click();
   await expect(page.locator(".capture-steps [aria-current='step']")).toHaveText(
@@ -142,7 +150,7 @@ test("popup connects, recovers from AI failures, preserves a draft, and prevents
     await page.evaluate(() => localStorage.getItem("test-refreshed")),
   ).toBe("true");
   await page
-    .getByRole("button", { name: "Or enter the details yourself", exact: true })
+    .getByRole("button", { name: "Enter details manually", exact: true })
     .click();
   await expect(page.locator(".capture-steps [aria-current='step']")).toHaveText(
     "2. Review",
@@ -160,6 +168,9 @@ test("popup connects, recovers from AI failures, preserves a draft, and prevents
     "Popup Integration Test",
   );
   await page
+    .locator("body")
+    .screenshot({ path: path.join(review, "popup-review-active.png") });
+  await page
     .getByRole("button", { name: "Save for later", exact: true })
     .click();
   await expect(page.locator("#save-applied-btn")).toBeDisabled();
@@ -169,8 +180,6 @@ test("popup connects, recovers from AI failures, preserves a draft, and prevents
   );
   await expect(page.locator("#save-later-btn")).toBeDisabled();
   expect(saveCount).toBe(1);
-  const review = path.resolve(".impeccable/review");
-  await fs.mkdir(review, { recursive: true });
   await page.locator("body").screenshot({
     path: path.join(review, "popup-review.png"),
   });
