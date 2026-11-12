@@ -19,8 +19,16 @@ export function Modal({
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
-    if (open && !element.open) element.showModal();
-    else if (!open && element.open) element.close();
+    if (!open) {
+      if (element.open) element.close();
+      return;
+    }
+    const previous = document.activeElement as HTMLElement | null;
+    if (!element.open) element.showModal();
+    return () => {
+      if (element.open) element.close();
+      if (previous?.isConnected) previous.focus();
+    };
   }, [open]);
   return (
     <dialog
@@ -38,6 +46,7 @@ export function Modal({
       <div className="dialog-heading">
         <h2 id={titleId}>{title}</h2>
         <button
+          type="button"
           className="icon-button"
           aria-label="Close dialog"
           onClick={onClose}

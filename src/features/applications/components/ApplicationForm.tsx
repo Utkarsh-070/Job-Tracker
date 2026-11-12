@@ -15,6 +15,7 @@ import {
   type ApplicationStatus,
 } from "../statuses";
 import { dateInput, localDateInput, validateApplication } from "../validation";
+import { DeleteApplicationButton } from "./DeleteApplicationButton";
 import { InterviewCalendar } from "./InterviewCalendar";
 import { ContactsSection } from "./ContactsSection";
 import type { Application, ContactInput } from "../types";
@@ -72,9 +73,7 @@ export function ApplicationForm({
       role: c.role,
       email: c.email ?? "",
       linkedinUrl: c.linkedinUrl ?? "",
-      lastContactedAt: c.lastContactedAt
-        ? dateInput(c.lastContactedAt)
-        : "",
+      lastContactedAt: c.lastContactedAt ? dateInput(c.lastContactedAt) : "",
     })),
   );
 
@@ -107,9 +106,8 @@ export function ApplicationForm({
     }
     startTransition(async () => {
       try {
-        const { interviewDate: _d, contacts: _c, ...rest } = validated.data;
         const input = {
-          ...rest,
+          ...validated.data,
           status: fields.status as ApplicationStatus,
           interviewDate: fields.interviewDate || null,
           interviewers: fields.interviewers || null,
@@ -137,158 +135,160 @@ export function ApplicationForm({
       className="application-form"
       aria-busy={isPending}
     >
-      <fieldset disabled={isPending}>
-        <legend>Opportunity details</legend>
-        <p className="section-description">
-          The essentials. Required fields are marked with an asterisk.
-        </p>
-        <div className="form-grid">
-          <Input
-            id="company"
-            label="Company *"
-            required
-            maxLength={200}
-            value={fields.company}
-            onChange={(event) => updateField("company", event.target.value)}
-            error={errors.company}
-            placeholder="Company name"
-            autoComplete="organization"
-          />
-          <Input
-            id="role"
-            label="Role *"
-            required
-            maxLength={300}
-            value={fields.role}
-            onChange={(event) => updateField("role", event.target.value)}
-            error={errors.role}
-            placeholder="Job title"
-          />
-          <Select
-            id="jobType"
-            label="Job type *"
-            required
-            options={[
-              { value: "", label: "Select job type" },
-              ...JOB_TYPES.map((value) => ({
-                value,
-                label: JOB_TYPE_LABELS[value],
-              })),
-            ]}
-            value={fields.jobType}
-            onChange={(event) => updateField("jobType", event.target.value)}
-            error={errors.jobType}
-          />
-          <Select
-            id="status"
-            label="Application stage"
-            options={APPLICATION_STATUSES.map((value) => ({
-              value,
-              label: STATUS_LABELS[value],
-            }))}
-            value={fields.status}
-            onChange={(event) => updateField("status", event.target.value)}
-            error={errors.status}
-          />
-          <Input
-            id="appliedAt"
-            label={
-              fields.status === "SAVED" ? "Date saved *" : "Application date *"
-            }
-            required
-            type="date"
-            min="1900-01-01"
-            max="2100-12-31"
-            value={fields.appliedAt}
-            onChange={(event) => updateField("appliedAt", event.target.value)}
-            error={errors.appliedAt}
-          />
-          <Input
-            id="salary"
-            label="Salary / compensation"
-            maxLength={200}
-            value={fields.salary}
-            onChange={(event) => updateField("salary", event.target.value)}
-            error={errors.salary}
-            placeholder="As listed, including currency"
-          />
-          <Input
-            id="url"
-            label="Job listing URL"
-            type="url"
-            maxLength={2048}
-            value={fields.url}
-            onChange={(event) => updateField("url", event.target.value)}
-            error={errors.url}
-            placeholder="https://"
-          />
-          <Input
-            id="source"
-            label="Job application source"
-            maxLength={200}
-            value={fields.source}
-            onChange={(event) => updateField("source", event.target.value)}
-            error={errors.source}
-            placeholder="Where you found this job"
-          />
-          <Input
-            id="location"
-            label="Location"
-            maxLength={200}
-            value={fields.location}
-            onChange={(event) => updateField("location", event.target.value)}
-            error={errors.location}
-            placeholder="N/A if remote, otherwise fill in"
-          />
+      <div className="editor-columns">
+        <div className="editor-main">
+          <fieldset className="opportunity-fields" disabled={isPending}>
+            <legend>Opportunity details</legend>
+            <p className="section-description">
+              The essentials. Required fields are marked with an asterisk.
+            </p>
+            <div className="form-grid">
+              <Input
+                id="company"
+                label="Company *"
+                required
+                maxLength={200}
+                value={fields.company}
+                onChange={(event) => updateField("company", event.target.value)}
+                error={errors.company}
+                placeholder="Company name"
+                autoComplete="organization"
+              />
+              <Input
+                id="role"
+                label="Role *"
+                required
+                maxLength={300}
+                value={fields.role}
+                onChange={(event) => updateField("role", event.target.value)}
+                error={errors.role}
+                placeholder="Job title"
+              />
+              <Select
+                id="jobType"
+                label="Job type *"
+                required
+                options={[
+                  { value: "", label: "Select job type" },
+                  ...JOB_TYPES.map((value) => ({
+                    value,
+                    label: JOB_TYPE_LABELS[value],
+                  })),
+                ]}
+                value={fields.jobType}
+                onChange={(event) => updateField("jobType", event.target.value)}
+                error={errors.jobType}
+              />
+              <Select
+                id="status"
+                label="Application stage"
+                options={APPLICATION_STATUSES.map((value) => ({
+                  value,
+                  label: STATUS_LABELS[value],
+                }))}
+                value={fields.status}
+                onChange={(event) => updateField("status", event.target.value)}
+                error={errors.status}
+              />
+              <Input
+                id="appliedAt"
+                label={
+                  fields.status === "SAVED"
+                    ? "Date saved *"
+                    : "Application date *"
+                }
+                required
+                type="date"
+                min="1900-01-01"
+                max="2100-12-31"
+                value={fields.appliedAt}
+                onChange={(event) =>
+                  updateField("appliedAt", event.target.value)
+                }
+                error={errors.appliedAt}
+              />
+              <Input
+                id="salary"
+                label="Salary / compensation"
+                maxLength={200}
+                value={fields.salary}
+                onChange={(event) => updateField("salary", event.target.value)}
+                error={errors.salary}
+                placeholder="As listed, including currency"
+              />
+              <Input
+                id="source"
+                label="Job application source"
+                maxLength={200}
+                value={fields.source}
+                onChange={(event) => updateField("source", event.target.value)}
+                error={errors.source}
+                placeholder="Where you found this job"
+              />
+              <Input
+                id="location"
+                label="Location"
+                maxLength={200}
+                value={fields.location}
+                onChange={(event) =>
+                  updateField("location", event.target.value)
+                }
+                error={errors.location}
+                placeholder="N/A if remote, otherwise fill in"
+              />
+              <Input
+                id="url"
+                label="Job listing URL"
+                type="url"
+                maxLength={2048}
+                value={fields.url}
+                onChange={(event) => updateField("url", event.target.value)}
+                error={errors.url}
+                placeholder="https://"
+              />
+            </div>
+          </fieldset>
+          <fieldset className="notes-fields" disabled={isPending}>
+            <legend>Notes</legend>
+            <Textarea
+              id="notes"
+              label="Notes"
+              maxLength={10000}
+              value={fields.notes}
+              onChange={(event) => updateField("notes", event.target.value)}
+              placeholder="What should you remember about this opportunity?"
+              error={errors.notes}
+            />
+          </fieldset>
         </div>
-      </fieldset>
-
-      <fieldset disabled={isPending}>
-        <legend>Interview &amp; calendar</legend>
-        <p className="section-description">
-          Schedule an interview date and generate an .ics file or direct Add to Google Calendar link with pre-populated details.
-        </p>
-        <InterviewCalendar
-          company={fields.company}
-          role={fields.role}
-          interviewDate={fields.interviewDate}
-          interviewers={fields.interviewers}
-          meetingUrl={fields.meetingUrl}
-          onChangeDate={(v) => updateField("interviewDate", v)}
-          onChangeInterviewers={(v) => updateField("interviewers", v)}
-          onChangeMeetingUrl={(v) => updateField("meetingUrl", v)}
-          errors={errors}
-        />
-      </fieldset>
-
-      <fieldset disabled={isPending}>
-        <legend>Recruiter &amp; referral contacts</legend>
-        <p className="section-description">
-          Keep track of recruiters, hiring managers, and referrers managing your candidacy or referral.
-        </p>
-        <ContactsSection
-          contacts={contacts}
-          onChange={setContacts}
-          errors={errors}
-        />
-      </fieldset>
-
-      <fieldset disabled={isPending}>
-        <legend>A place for the details</legend>
-        <p className="section-description">
-          Requirements, contacts, interview notes. Whatever helps you pick up
-          where you left off.
-        </p>
-        <Textarea
-          id="notes"
-          label="Notes"
-          maxLength={10000}
-          value={fields.notes}
-          onChange={(event) => updateField("notes", event.target.value)}
-          placeholder="What should you remember about this opportunity?"
-          error={errors.notes}
-        />
-      </fieldset>
+        <div className="editor-sidebar">
+          <fieldset className="interview-fields" disabled={isPending}>
+            <legend>Interview &amp; calendar</legend>
+            <p className="section-description">
+              Keep interview details with this role.
+            </p>
+            <InterviewCalendar
+              company={fields.company}
+              role={fields.role}
+              interviewDate={fields.interviewDate}
+              interviewers={fields.interviewers}
+              meetingUrl={fields.meetingUrl}
+              onChangeDate={(v) => updateField("interviewDate", v)}
+              onChangeInterviewers={(v) => updateField("interviewers", v)}
+              onChangeMeetingUrl={(v) => updateField("meetingUrl", v)}
+              errors={errors}
+            />
+          </fieldset>
+          <fieldset className="contact-fields" disabled={isPending}>
+            <legend>Contacts</legend>
+            <ContactsSection
+              contacts={contacts}
+              onChange={setContacts}
+              errors={errors}
+            />
+          </fieldset>
+        </div>
+      </div>
 
       {serverError && (
         <p className="inline-error" role="alert">
@@ -314,7 +314,13 @@ export function ApplicationForm({
         >
           Cancel
         </Link>
-        <span>Only you can access your applications.</span>
+        {application && !preview && (
+          <DeleteApplicationButton
+            id={application.id}
+            company={application.company}
+          />
+        )}
+        <span>Only your account can access this record.</span>
       </div>
     </form>
   );

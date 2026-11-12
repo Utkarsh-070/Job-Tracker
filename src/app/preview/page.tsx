@@ -1,9 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
-import { Icon } from "@/components/ui/Icon";
 import { ApplicationsView } from "@/features/applications/components/ApplicationsView";
-import { ApplicationForm } from "@/features/applications/components/ApplicationForm";
+import { ApplicationEditor } from "@/features/applications/components/ApplicationEditor";
 import type { Application } from "@/features/applications/types";
 import {
   APPLICATION_STATUSES,
@@ -38,12 +36,12 @@ const sampleApplications: Application[] = examples.map(
     role,
     status,
     salary,
-    url: null,
+    url: "https://careers.example.com/" + company.toLowerCase(),
     jobType: /intern/i.test(role) ? "INTERN" : "FULL_TIME",
-    source: null,
+    source: "Career site",
     location: null,
     notes:
-      "Synthetic example for the design preview. This is not a real job listing or compensation claim.",
+      "Sample notes: review the role requirements and keep interview preparation here.",
     appliedAt: new Date(date),
     createdAt: new Date(date),
     updatedAt: new Date(date),
@@ -77,26 +75,7 @@ export default async function PreviewPage({
   return (
     <AppShell preview>
       {params.view === "new" || application ? (
-        <main id="main-content" className="form-page">
-          <Link className="back-link" href="/preview">
-            <Icon name="back" />
-            All applications
-          </Link>
-          <div className="page-heading">
-            <div>
-              <h1>
-                {application ? application.company : "A new possibility"}
-                <span className="heading-dot">.</span>
-              </h1>
-              <p>
-                {application
-                  ? "Update the details of your next move."
-                  : "Add the details. Make the next move yours."}
-              </p>
-            </div>
-          </div>
-          <ApplicationForm application={application} preview />
-        </main>
+        <ApplicationEditor application={application} preview />
       ) : (
         <ApplicationsView
           applications={

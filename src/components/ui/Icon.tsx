@@ -13,7 +13,8 @@ const paths = {
   browser: "M3 8h18M6 5h.01M9 5h.01M3 3h18v18H3Z",
   logout: "M9 5H4v14h5m7-14 5 7-5 7M9 12h12",
   file: "M14 2H4v20h16V8Zm0 0v6h6M8 12h8M8 16h5",
-  calendar: "M8 2v4M16 2v4M3 10h18M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z",
+  calendar:
+    "M8 2v4M16 2v4M3 10h18M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z",
   "chevron-up": "m18 15-6-6-6 6",
   "chevron-down": "m6 9 6 6 6-6",
   user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z",
@@ -51,9 +52,9 @@ export function BrandMark() {
       aria-hidden="true"
     >
       <path
-        d="M16 3v26M3 16h26M6.8 6.8l18.4 18.4M6.8 25.2 25.2 6.8"
+        d="M6 3h20v26H6Z M11 11l4 4 7-8 M11 22h10"
         stroke="currentColor"
-        strokeWidth="3.6"
+        strokeWidth="2"
       />
     </svg>
   );

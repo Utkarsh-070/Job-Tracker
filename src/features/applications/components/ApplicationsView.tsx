@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ApplicationList } from "./ApplicationList";
+import { OpportunityDetails } from "./OpportunityDetails";
 import { isStale } from "./StaleAlert";
 import {
   APPLICATION_STATUSES,
@@ -26,9 +27,7 @@ export function ApplicationsView({
 }: Props) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("recent");
-  const [status, setStatus] = useState<FilterValue>(
-    initialStatus,
-  );
+  const [status, setStatus] = useState<FilterValue>(initialStatus);
   const staleCount = useMemo(
     () => applications.filter(isStale).length,
     [applications],
@@ -47,7 +46,8 @@ export function ApplicationsView({
     const searchTerm = query.trim().toLocaleLowerCase();
     const matchingApplications = applications.filter(
       (app) =>
-        (status === undefined || (status === "STALE" ? isStale(app) : app.status === status)) &&
+        (status === undefined ||
+          (status === "STALE" ? isStale(app) : app.status === status)) &&
         (!searchTerm ||
           app.company.toLocaleLowerCase().includes(searchTerm) ||
           app.role.toLocaleLowerCase().includes(searchTerm)),
@@ -73,30 +73,39 @@ export function ApplicationsView({
     URL.revokeObjectURL(url);
   }
   const stages: { label: string; value: FilterValue; count: number }[] = [
-    { label: "All applications", value: undefined, count: applications.length },
+    { label: "All", value: undefined, count: applications.length },
     ...APPLICATION_STATUSES.map((stage) => ({
       label: STATUS_LABELS[stage],
       value: stage as FilterValue,
       count: counts[stage],
     })),
-    { label: "Needs attention", value: "STALE" as FilterValue, count: staleCount },
+    {
+      label: "Needs attention",
+      value: "STALE" as FilterValue,
+      count: staleCount,
+    },
   ];
   const add = preview ? "/preview?view=new" : "/applications/new";
+  const [selectedId, setSelectedId] = useState(applications[0]?.id);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeDetail = useCallback(() => setMobileOpen(false), []);
+  const selected =
+    visibleApplications.find((app) => app.id === selectedId) ||
+    visibleApplications[0];
   const filtersActive = Boolean(status || query.trim());
   function clearFilters() {
     setQuery("");
     setStatus(undefined);
   }
+  function selectApplication(app: Application) {
+    setSelectedId(app.id);
+    setMobileOpen(window.matchMedia("(max-width: 760px)").matches);
+  }
   return (
     <main id="main-content" className="dashboard">
       <div className="page-heading">
-        <div>
-          <h1>
-            Applications<span className="heading-dot">.</span>
-          </h1>
-          <p>A little clarity for your next big move.</p>
-        </div>
-        <Link className="button button-primary" href={add}>
+        <h1>Applications</h1>
+        <Link className="button button-primary add-application" href={add}>
           <Icon name="plus" />
           Add application
         </Link>
@@ -111,13 +120,7 @@ export function ApplicationsView({
             key={stage.label}
             type="button"
             className={
-              status === stage.value
-                ? stage.value === "STALE"
-                  ? "stage-tab is-active stale-tab"
-                  : "stage-tab is-active"
-                : stage.value === "STALE" && staleCount > 0
-                  ? "stage-tab stale-tab"
-                  : "stage-tab"
+              "stage-tab" + (status === stage.value ? " is-active" : "")
             }
             aria-pressed={status === stage.value}
             onClick={() => setStatus(stage.value)}
@@ -127,7 +130,7 @@ export function ApplicationsView({
           </button>
         ))}
       </div>
-      <section className="ledger" aria-label="Application ledger">
+      <section className="ledger" aria-label="Application workspace">
         <div className="ledger-toolbar">
           <div className="search-control">
             <Icon name="search" />
@@ -153,12 +156,12 @@ export function ApplicationsView({
               </select>
             </label>
             <button
-              className="button button-quiet"
+              className="button button-secondary"
+              type="button"
               onClick={exportCsv}
               disabled={!visibleApplications.length || !!error}
             >
-              <Icon name="download" />
-              <span>Export</span>
+              Export
             </button>
           </div>
         </div>
@@ -168,6 +171,7 @@ export function ApplicationsView({
             <h2>Your tracker couldn’t connect.</h2>
             <p>{error}</p>
             <button
+              type="button"
               className="button button-secondary"
               onClick={() => window.location.reload()}
             >
@@ -175,10 +179,45 @@ export function ApplicationsView({
             </button>
           </div>
         ) : visibleApplications.length ? (
-          <ApplicationList
-            applications={visibleApplications}
-            preview={preview}
-          />
+          <div className="opportunity-workspace">
+            <div className="opportunity-index">
+              <div className="index-caption">
+                <span>Your opportunities</span>
+                <span aria-live="polite">
+                  {visibleApplications.length} opportunities
+                  {preview ? " · Sample data" : ""}
+                </span>
+              </div>
+              <ApplicationList
+                applications={visibleApplications}
+                selectedId={selected?.id}
+                onSelect={selectApplication}
+              />
+              <footer className="ledger-footer">
+                <span>
+                  {visibleApplications.length} of {applications.length}{" "}
+                  applications{preview ? " · Sample data" : ""}
+                </span>
+                {filtersActive && (
+                  <button
+                    className="button button-quiet"
+                    type="button"
+                    onClick={clearFilters}
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </footer>
+            </div>
+            {selected && (
+              <OpportunityDetails
+                application={selected}
+                preview={preview}
+                mobileOpen={mobileOpen}
+                onClose={closeDetail}
+              />
+            )}
+          </div>
         ) : (
           <div className="empty-state">
             <Icon name={applications.length ? "search" : "file"} />
@@ -190,11 +229,12 @@ export function ApplicationsView({
             <p>
               {applications.length
                 ? "Try a different company or role, or clear the stage filter."
-                : "Add your first application, or capture a job posting with the Browser extension."}
+                : "Add your first application, or capture a posting with the browser extension."}
             </p>
             {applications.length ? (
               <button
                 className="button button-secondary"
+                type="button"
                 onClick={clearFilters}
               >
                 Clear filters
@@ -207,43 +247,7 @@ export function ApplicationsView({
             )}
           </div>
         )}
-        <footer className="ledger-footer" aria-live="polite">
-          <span>
-            {error
-              ? "Applications unavailable"
-              : visibleApplications.length +
-                " of " +
-                applications.length +
-                " applications"}
-          </span>
-          {filtersActive && visibleApplications.length > 0 ? (
-            <button
-              className="button button-quiet"
-              type="button"
-              onClick={clearFilters}
-            >
-              Clear filters
-            </button>
-          ) : (
-            <span>Keep the details. See the possibilities.</span>
-          )}
-        </footer>
       </section>
-      <div className="workspace-footnote">
-        <span className="small-asterisk" aria-hidden="true">
-          <Icon name="plus" />
-        </span>
-        <p>
-          Found something worth pursuing?
-          <br />
-          <strong>Save it now. Decide when you’re ready.</strong>
-        </p>
-        <span>
-          Built for the search.
-          <br />
-          And what comes next.
-        </span>
-      </div>
     </main>
   );
 }
