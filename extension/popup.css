@@ -498,3 +498,17 @@ h1 > span {
     scroll-behavior: auto !important;
   }
 }
+
+html,
+body {
+  width: 376px;
+  min-width: 376px;
+  max-width: 376px;
+  height: 600px;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  max-height: 100vh;
+}

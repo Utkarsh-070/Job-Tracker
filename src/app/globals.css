@@ -1676,3 +1676,39 @@ textarea.form-control {
     border-top: 1px solid #d7c5b6;
   }
 }
+
+.editor-sidebar > fieldset > legend {
+  float: left;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.editor-sidebar > fieldset > legend + * {
+  clear: both;
+}
+
+.editor-sidebar .calendar-actions {
+  gap: 8px;
+}
+
+.editor-sidebar .calendar-actions .button {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-color: var(--line-strong);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.editor-sidebar .calendar-actions .button:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.editor-sidebar .calendar-actions svg {
+  display: block;
+  flex: 0 0 16px;
+}
