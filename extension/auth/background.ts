@@ -24,6 +24,8 @@ import {
 } from "firebase/auth/web-extension";
 import { permissionPattern, validateSettings } from "../shared.ts";
 
+import { requireOffscreenSupport } from "../compatibility.ts";
+
 let activeInstance: { appUrl: string; auth: Auth } | undefined;
 let signingIn: Promise<ExtensionUser> | null = null;
 let creatingOffscreen: Promise<void> | null = null;
@@ -109,12 +111,13 @@ async function getTrackerAuth() {
 }
 
 async function ensureOffscreenDocument() {
-  if (await chrome.offscreen.hasDocument()) return;
+  const offscreen = requireOffscreenSupport(chrome.offscreen);
+  if (await offscreen.hasDocument()) return;
   if (!creatingOffscreen) {
-    creatingOffscreen = chrome.offscreen
+    creatingOffscreen = offscreen
       .createDocument({
         url: "offscreen.html",
-        reasons: [chrome.offscreen.Reason.IFRAME_SCRIPTING],
+        reasons: [offscreen.Reason.IFRAME_SCRIPTING],
         justification:
           "Let Firebase show Google sign-in from the selected tracker without loading remote code in the extension.",
       })

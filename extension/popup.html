@@ -17,9 +17,9 @@
           aria-hidden="true"
         >
           <path
-            d="M16 3v26M3 16h26M6.8 6.8l18.4 18.4M6.8 25.2 25.2 6.8"
+            d="M6 3h20v26H6Z M11 11l4 4 7-8 M11 22h10"
             stroke="currentColor"
-            stroke-width="3.5"
+            stroke-width="2"
           /></svg
         ><span>job tracker<span class="brand-period">.</span></span></a
       >
@@ -50,7 +50,7 @@
         class="view"
         aria-labelledby="settings-heading"
       >
-        <h1 id="settings-heading">Make the connection<span>.</span></h1>
+        <h1 id="settings-heading">Make the connection.</h1>
         <p class="view-description">
           Connect to your tracker with Google. Use the same account as the site;
           your applications stay in your own workspace.
@@ -96,10 +96,23 @@
           <li>3. Save</li>
         </ol>
         <div class="capture-area">
-          <h1>A possibility,<br />worth keeping<span>.</span></h1>
+          <span class="capture-symbol" aria-hidden="true"
+            ><svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path
+                d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M12 7v10M7 12h10"
+              /></svg
+          ></span>
+          <h1>Capture a job</h1>
           <p class="view-description">
-            Open a job posting. Capture the essentials. Keep your next move in
-            view.
+            Read the posting once. Keep its details together, then review before
+            you save.
           </p>
           <div class="source-page" id="source-page" hidden>
             <svg
@@ -129,7 +142,7 @@
             </svg>
           </button>
           <button class="text-button" type="button" id="manual-btn">
-            Or enter the details yourself
+            Enter details manually
           </button>
           <div
             id="capture-msg"
@@ -137,98 +150,108 @@
             role="status"
             aria-live="polite"
           ></div>
+          <p class="capture-privacy">
+            Capture reads this page only when you choose.
+          </p>
         </div>
         <form id="form-section" class="form-section">
           <div class="review-heading">
-            <h2>Give it a once-over.</h2>
-            <p>AI can miss things. Check the details before saving.</p>
+            <h2>Review details</h2>
+            <p>Check the details before saving.</p>
           </div>
-          <div class="field">
-            <label for="company">Company *</label
-            ><input
-              type="text"
-              id="company"
-              required
-              maxlength="200"
-              autocomplete="organization"
-              placeholder="Company name"
-            />
-          </div>
-          <div class="field">
-            <label for="role">Role *</label
-            ><input
-              type="text"
-              id="role"
-              required
-              maxlength="300"
-              placeholder="Job title"
-            />
-          </div>
-          <div class="field-grid">
+          <div
+            class="review-fields"
+            role="region"
+            aria-label="Job details"
+            tabindex="0"
+          >
             <div class="field">
-              <label for="applied-at">Date *</label
+              <label for="company">Company *</label
               ><input
-                type="date"
-                id="applied-at"
+                type="text"
+                id="company"
                 required
-                min="1900-01-01"
-                max="2100-12-31"
+                maxlength="200"
+                autocomplete="organization"
+                placeholder="Company name"
               />
             </div>
             <div class="field">
-              <label for="salary">Compensation</label
+              <label for="role">Role *</label
               ><input
                 type="text"
-                id="salary"
-                maxlength="200"
-                placeholder="As listed"
+                id="role"
+                required
+                maxlength="300"
+                placeholder="Job title"
               />
             </div>
-          </div>
-          <div class="field-grid">
+            <div class="field-grid">
+              <div class="field">
+                <label for="applied-at">Date *</label
+                ><input
+                  type="date"
+                  id="applied-at"
+                  required
+                  min="1900-01-01"
+                  max="2100-12-31"
+                />
+              </div>
+              <div class="field">
+                <label for="salary">Compensation</label
+                ><input
+                  type="text"
+                  id="salary"
+                  maxlength="200"
+                  placeholder="As listed"
+                />
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="location">Location</label
+                ><input
+                  type="text"
+                  id="location"
+                  maxlength="200"
+                  placeholder="Remote, City, Hybrid…"
+                />
+              </div>
+              <div class="field">
+                <label for="job-type">Job type</label
+                ><select id="job-type">
+                  <option value="FULL_TIME">Full-Time</option>
+                  <option value="INTERN">Internship</option>
+                </select>
+              </div>
+            </div>
             <div class="field">
-              <label for="location">Location</label
+              <label for="source">Source</label
               ><input
                 type="text"
-                id="location"
+                id="source"
                 maxlength="200"
-                placeholder="Remote, City, Hybrid…"
+                placeholder="LinkedIn, Indeed, Greenhouse…"
               />
             </div>
             <div class="field">
-              <label for="job-type">Job type</label
-              ><select id="job-type">
-                <option value="FULL_TIME">Full-Time</option>
-                <option value="INTERN">Internship</option>
-              </select>
+              <label for="url">Job listing URL</label
+              ><input
+                type="url"
+                id="url"
+                maxlength="2048"
+                placeholder="https://"
+              />
             </div>
-          </div>
-          <div class="field">
-            <label for="source">Source</label
-            ><input
-              type="text"
-              id="source"
-              maxlength="200"
-              placeholder="LinkedIn, Indeed, Greenhouse…"
-            />
-          </div>
-          <div class="field">
-            <label for="url">Job listing URL</label
-            ><input
-              type="url"
-              id="url"
-              maxlength="2048"
-              placeholder="https://"
-            />
-          </div>
-          <div class="field">
-            <label for="notes">Notes</label
-            ><textarea
-              id="notes"
-              maxlength="10000"
-              rows="3"
-              placeholder="Requirements, benefits, things to remember…"
-            ></textarea>
+            <div class="field">
+              <label for="notes">Notes</label
+              ><textarea
+                id="notes"
+                maxlength="10000"
+                rows="3"
+                placeholder="Requirements, benefits, things to remember…"
+              ></textarea>
+            </div>
           </div>
           <div
             id="save-msg"
